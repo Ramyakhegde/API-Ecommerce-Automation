@@ -1,4 +1,3 @@
-
 # **API Ecommerce Automation Framework**
 
 This project demonstrates a complete API automation testing framework built with **RestAssured**, **TestNG**, and **Maven**, designed for testing Ecommerce APIs such as authentication, product operations, and category endpoints.
