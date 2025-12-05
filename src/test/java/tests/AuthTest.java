@@ -13,11 +13,11 @@ public class AuthTest extends BaseTest {
     public void loginTest() {
 
         String jsonBody = """
-        {
-            "username": "mor_2314",
-            "password": "83r5^_"
-        }
-        """;
+                {
+                    "username": "mor_2314",
+                    "password": "83r5^_"
+                }
+                """;
 
         Response response = RestAssured
                 .given()
@@ -26,11 +26,11 @@ public class AuthTest extends BaseTest {
                 .when()
                 .post("/auth/login")
                 .then()
-                .statusCode(200)                               // 1) status check
-                .header("Content-Type", containsString("json")) // 2) header check
-                .time(lessThan(2000L))                          // 3) performance < 2 sec
-                .body("token", notNullValue())                  // 4) key exists
-                .body("token", instanceOf(String.class))        // 5) type check
+                .statusCode(201)                               // ✔ Correct status
+                .header("Content-Type", containsString("json"))
+                .time(lessThan(2000L))
+                .body("token", notNullValue())
+                .body("token", instanceOf(String.class))
                 .extract().response();
 
         String token = response.jsonPath().getString("token");
