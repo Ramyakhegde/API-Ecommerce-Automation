@@ -1,68 +1,39 @@
 package tests;
 
 import com.ecommerce.api.Base.BaseTest;
+import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import org.testng.annotations.Test;
-
-import java.util.HashMap;
 
 import static org.hamcrest.Matchers.*;
 
 public class AuthTest extends BaseTest {
 
     @Test
-    public void loginAndGetToken() {
+    public void loginTest() {
 
-        HashMap<String, String> loginData = new HashMap<>();
-        loginData.put("username", "admin");
-        loginData.put("password", "password123");
+        String jsonBody = """
+        {
+            "username": "mor_2314",
+            "password": "83r5^_"
+        }
+        """;
 
-        Response res =
-                io.restassured.RestAssured
-                        .given()
-                        .body(loginData)
-                        .when()
-                        .post("https://restful-booker.herokuapp.com/auth")
-                        .then()
-                        .statusCode(200)
-                        .body("token", notNullValue())
-                        .extract().response();
-
-        String token = res.jsonPath().getString("token");
-        System.out.println("Token = " + token);
-    }
-
-
-    @Test
-    public void updateBookingWithToken() {
-
-        // Step 1: Login to get token
-        HashMap<String, String> loginData = new HashMap<>();
-        loginData.put("username", "admin");
-        loginData.put("password", "password123");
-
-        String token = io.restassured.RestAssured
+        Response response = RestAssured
                 .given()
-                .body(loginData)
+                .spec(reqSpec)
+                .body(jsonBody)
                 .when()
-                .post("https://restful-booker.herokuapp.com/auth")
+                .post("/auth/login")
                 .then()
-                .statusCode(200)
-                .extract().path("token");
+                .statusCode(200)                               // 1) status check
+                .header("Content-Type", containsString("json")) // 2) header check
+                .time(lessThan(2000L))                          // 3) performance < 2 sec
+                .body("token", notNullValue())                  // 4) key exists
+                .body("token", instanceOf(String.class))        // 5) type check
+                .extract().response();
 
-        // Step 2: Body for update
-        HashMap<String, Object> updateBody = new HashMap<>();
-        updateBody.put("firstname", "Ramya");
-        updateBody.put("lastname", "QA");
-
-        // Step 3: Send PUT request with token
-        io.restassured.RestAssured
-                .given()
-                .cookie("token", token)
-                .body(updateBody)
-                .when()
-                .put("https://restful-booker.herokuapp.com/booking/1")
-                .then()
-                .statusCode(anyOf(is(200), is(201)));
+        String token = response.jsonPath().getString("token");
+        System.out.println("Generated Token = " + token);
     }
 }

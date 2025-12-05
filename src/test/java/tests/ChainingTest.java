@@ -1,6 +1,7 @@
 package tests;
 
 import com.ecommerce.api.Base.BaseTest;
+import com.ecommerce.api.pojo.Product;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import org.testng.annotations.Test;
@@ -15,14 +16,13 @@ public class ChainingTest extends BaseTest {
     public void postThenGetProduct() {
 
         // Step 1: POST create product
-        HashMap<String, Object> data = new HashMap<>();
-        data.put("title", "Chained Phone");
-        data.put("price", 599);
+        Product product = new Product("Chained Phone", 599);
+
 
         Response postRes = RestAssured
                 .given()
                 .spec(reqSpec)
-                .body(data)
+                .body(product)
                 .when()
                 .post("/products")
                 .then()
